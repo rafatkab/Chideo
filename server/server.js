@@ -1,29 +1,31 @@
+// const port = 3001;
+
+// const io = require("socket.io")(3001, {
+//   cors: {
+//     origin: ["http://localhost:3000"],
+//   },
+// });
+
+// io.on("connection", (socket) => {
+//   console.log(socket.id);
+// });
+
+const port = 3001;
 const express = require("express");
 const app = express();
-const http = require("http");
-const { Server } = require("socket.io");
-const cors = require("cors");
-const { log } = require("console");
-app.use(cors());
-
-const server = http.createServer(app);
-
-const io = new Server(server, {
+const server = require("http").Server(app);
+const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000/",
-    methods: ["GET", "POST"],
+    origin: ["http://localhost:3000"],
   },
 });
 
 io.on("connection", (socket) => {
-  console.log(`User Connected ${socket.id}`);
-
-  // socket.on("send message", (data) => {
-  //   console.log(data);
-  // });
+  socket.on("send-message", (message) => {
+    socket.broadcast.emit("recieve-message", message);
+  });
 });
 
-const PORT = 3001;
-server.listen(PORT, () => {
-  console.log(`SERVER IS RUNNING ON: http://localhost:${PORT}/`);
+server.listen(port, () => {
+  console.log(`PORT ${port} IS RUNNING`);
 });
